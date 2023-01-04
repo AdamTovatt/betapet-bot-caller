@@ -17,7 +17,7 @@ namespace BetapetBotCaller
 
             httpClient = new HttpClient(handler);
 
-            handleRequestUrl = string.Format("https://localhost:{2}/bot/handleEverything?username={0}&password={1}", username, password, string.IsNullOrEmpty(hostPort) ? "5012" : hostPort);
+            handleRequestUrl = string.Format("http://localhost:{2}/bot/handleEverything?username={0}&password={1}", username, password, string.IsNullOrEmpty(hostPort) ? "5012" : hostPort);
         }
 
         public async Task<bool> HandleEverything()
