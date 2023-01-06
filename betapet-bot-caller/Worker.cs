@@ -7,6 +7,7 @@ namespace BetapetBotCaller
         private readonly ILogger<Worker> _logger;
 
         private BetapetBot bot;
+        private Random random;
 
         public Worker(ILogger<Worker> logger)
         {
@@ -36,6 +37,8 @@ namespace BetapetBotCaller
                 return;
 
             Parser.Default.ParseArguments<BotConfiguration>(Environment.GetCommandLineArgs()).WithParsed(HandleParse).WithNotParsed(HandleParseError);
+
+            random = new Random();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -44,12 +47,33 @@ namespace BetapetBotCaller
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                bool handleResult = await bot.HandleEverything();
+                if (GetBotIsAwake(DateTime.Now))
+                {
+                    bool handleResult = await bot.HandleEverything();
 
-                _logger.LogInformation("Handled betapetbot at {0}. Handle sucess: " + handleResult, DateTime.Now);
+                    _logger.LogInformation("Handled betapetbot at {0}. Handle sucess: " + handleResult, DateTime.Now);
+                }
+                else
+                {
 
-                await Task.Delay(1000 * 60 * 5, stoppingToken);
+                }
+
+                await Task.Delay((int)(1000 * 60 * GetSleepMinutes(DateTime.Now)), stoppingToken);
             }
+        }
+
+        private bool GetBotIsAwake(DateTime time)
+        {
+            double hour = time.Hour + (time.Minute / 60.0);
+            double probability = Math.Sin((hour / (2 * Math.PI)) + (Math.PI * -0.3));
+            return random.NextDouble() < probability;
+        }
+
+        private double GetSleepMinutes(DateTime time)
+        {
+            double hour = time.Hour + (time.Minute / 60.0);
+            double sleepMinutes = (10 - (5 * Math.Sin((hour / (2 * Math.PI)) + (Math.PI * -0.3))) - Math.Sin(hour)) / 2.0;
+            return sleepMinutes;
         }
     }
 }
