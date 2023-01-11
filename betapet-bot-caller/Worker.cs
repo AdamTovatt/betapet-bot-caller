@@ -49,9 +49,16 @@ namespace BetapetBotCaller
             {
                 if (GetBotIsAwake(DateTime.Now))
                 {
-                    bool handleResult = await bot.HandleEverything();
+                    try
+                    {
+                        bool handleResult = await bot.HandleEverything();
 
-                    _logger.LogInformation("Handled betapetbot at {0}. Handle sucess: " + handleResult, DateTime.Now);
+                        _logger.LogInformation("Handled betapetbot at {0}. Handle sucess: " + handleResult, DateTime.Now);
+                    }
+                    catch
+                    {
+                        _logger.LogWarning("Error when handling betapetbot");
+                    }
                 }
                 else
                 {
